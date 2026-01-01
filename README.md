@@ -95,9 +95,9 @@ git clone <your-repo-url>
 cd "Hierarchical Multi-Agent"
 ```
 
-2. **Set up backend:**
+2. **Set up be:**
 ```bash
-cd backend
+cd be
 python3.11 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -109,9 +109,9 @@ cp .env.example .env
 nano .env  # Add your API keys
 ```
 
-4. **Set up frontend:**
+4. **Set up fe:**
 ```bash
-cd ../frontend
+cd ../fe
 npm install
 ```
 
@@ -119,26 +119,26 @@ npm install
 
 Terminal 1 (Backend):
 ```bash
-cd backend
+cd be
 source venv/bin/activate
 python app.py
 ```
 
 Terminal 2 (Frontend):
 ```bash
-cd frontend
+cd fe
 npm run dev
 ```
 
 6. **Access the application:**
    - Open http://localhost:3000
-   - The backend runs on http://localhost:5000
+   - The be runs on http://localhost:5000
 
 ## 📁 Project Structure
 
 ```
 hierarchical-multi-agent/
-├── backend/
+├── be/
 │   ├── app.py                      # Flask application
 │   ├── config.py                   # Configuration management
 │   ├── requirements.txt            # Python dependencies
@@ -156,7 +156,7 @@ hierarchical-multi-agent/
 │   │   └── streaming.py           # SSE utilities
 │   └── tests/
 │       └── test_agents.py         # Unit tests
-├── frontend/
+├── fe/
 │   ├── src/
 │   │   ├── App.jsx                # Main app
 │   │   ├── components/
@@ -187,7 +187,7 @@ hierarchical-multi-agent/
 ### Backend Development
 
 ```bash
-cd backend
+cd be
 source venv/bin/activate
 
 # Run with auto-reload
@@ -203,7 +203,7 @@ tail -f logs/app.log
 ### Frontend Development
 
 ```bash
-cd frontend
+cd fe
 
 # Development mode (hot reload)
 npm run dev
@@ -217,7 +217,7 @@ npm run preview
 
 ### Environment Variables
 
-Create `.env` file in the backend directory:
+Create `.env` file in the be directory:
 
 ```bash
 # Required
@@ -260,7 +260,7 @@ chmod +x deployment/setup.sh
 
 3. **Configure environment:**
 ```bash
-cd /var/www/multi-agent/backend
+cd /var/www/multi-agent/be
 cp .env.example .env
 nano .env  # Add your API keys
 ```
@@ -293,7 +293,7 @@ chmod +x ssl-setup.sh
 
 ### Agent Configuration
 
-Modify `backend/config.py` to adjust:
+Modify `be/config.py` to adjust:
 - Model selection (GPT-4, GPT-3.5-turbo)
 - Temperature settings
 - Max iterations
@@ -301,7 +301,7 @@ Modify `backend/config.py` to adjust:
 
 ### Tool Configuration
 
-Add new tools in `backend/tools/`:
+Add new tools in `be/tools/`:
 
 ```python
 from langchain.tools import Tool
@@ -314,7 +314,7 @@ def create_my_tool() -> Tool:
     )
 ```
 
-Register in `backend/app.py`:
+Register in `be/app.py`:
 
 ```python
 from tools.my_tool import create_my_tool
@@ -396,7 +396,7 @@ pip install -r requirements.txt
 **API key errors:**
 ```bash
 # Check .env file
-cat backend/.env
+cat be/.env
 # Ensure keys are set correctly
 ```
 
@@ -417,8 +417,8 @@ npm install
 
 **CORS errors:**
 ```bash
-# Check CORS_ORIGINS in backend .env
-# Ensure it includes frontend URL
+# Check CORS_ORIGINS in be .env
+# Ensure it includes fe URL
 ```
 
 ### AWS Deployment Issues
@@ -447,13 +447,13 @@ sudo swapon /swapfile
 **Can't access from browser:**
 - Check security group allows HTTP (80)
 - Check Nginx is running: `sudo systemctl status nginx`
-- Check backend is running: `sudo supervisorctl status`
+- Check be is running: `sudo supervisorctl status`
 
 ## 🧪 Testing
 
-Run backend tests:
+Run be tests:
 ```bash
-cd backend
+cd be
 source venv/bin/activate
 python -m pytest tests/ -v
 ```
@@ -473,7 +473,7 @@ Manual testing checklist:
 **Development:**
 ```bash
 # Backend
-tail -f backend/logs/app.log
+tail -f be/logs/app.log
 
 # Flask console
 # (prints to terminal)

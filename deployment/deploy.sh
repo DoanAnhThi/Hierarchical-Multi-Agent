@@ -10,8 +10,8 @@ echo "=================================="
 # Variables
 APP_DIR="/var/www/multi-agent"
 VENV_DIR="$APP_DIR/venv"
-BACKEND_DIR="$APP_DIR/backend"
-FRONTEND_DIR="$APP_DIR/frontend"
+BACKEND_DIR="$APP_DIR/be"
+FRONTEND_DIR="$APP_DIR/fe"
 
 # Navigate to app directory
 cd $APP_DIR

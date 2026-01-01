@@ -132,7 +132,7 @@ source ../venv/bin/activate
 pip install -r requirements.txt
 
 # Frontend
-cd /var/www/multi-agent/frontend
+cd /var/www/multi-agent/fe
 npm install
 npm run build
 ```
