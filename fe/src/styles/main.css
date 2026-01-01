@@ -24,9 +24,17 @@
   .message-system {
     @apply bg-gray-100 border-l-4 border-gray-400 text-sm;
   }
-  
+
+  .message-thinking {
+    @apply bg-gray-50 border-l-2 border-gray-200 text-xs opacity-75;
+  }
+
   .agent-badge {
     @apply inline-block px-2 py-1 text-xs font-semibold rounded-full;
+  }
+
+  .agent-badge-thinking {
+    @apply text-xs px-1.5 py-0.5 font-medium;
   }
   
   .agent-strategy {

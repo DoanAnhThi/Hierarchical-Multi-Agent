@@ -44,29 +44,48 @@ Create a detailed execution plan:""")
     def create_plan(self, strategy: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create detailed execution plan from strategy
-        
+
         Args:
             strategy: Strategy from Strategy Agent
-            
+
         Returns:
             Detailed execution plan
         """
         try:
             logger.info("Planning Agent creating execution plan...")
-            
+
+            # Check if this is a conversational query
+            if strategy.get('is_conversational', False):
+                logger.info("Conversational query detected - skipping complex planning")
+                return {
+                    'agent': 'planning',
+                    'tasks': [{
+                        'task_id': 'conversational_response',
+                        'description': 'Generate friendly conversational response',
+                        'tool': 'direct_llm',
+                        'input': strategy.get('query', ''),
+                        'dependencies': []
+                    }],
+                    'execution_order': ['conversational_response'],
+                    'estimated_steps': 1,
+                    'is_conversational': True,
+                    'strategy_ref': strategy.get('approach', '')
+                }
+
             chain = self.prompt | self.llm
             response = chain.invoke({
                 "strategy": str(strategy),
                 "query": strategy.get('query', '')
             })
-            
+
             plan = self._parse_plan(response.content, strategy)
             plan['agent'] = 'planning'
             plan['strategy_ref'] = strategy.get('approach', '')
-            
+            plan['is_conversational'] = False
+
             logger.info(f"Plan created with {len(plan.get('tasks', []))} tasks")
             return plan
-            
+
         except Exception as e:
             logger.error(f"Planning Agent error: {e}")
             # Fallback plan
@@ -94,17 +113,23 @@ Create a detailed execution plan:""")
         """Create a simple fallback plan"""
         query = strategy.get('query', '')
         subtasks = strategy.get('subtasks', ['Search for information'])
-        
+
+        # Always use the original query for search
+        if not query or not query.strip():
+            search_input = "general information"
+        else:
+            search_input = query
+
         tasks = []
         for i, subtask in enumerate(subtasks[:3]):  # Limit to 3 tasks
             tasks.append({
                 'task_id': f'task_{i+1}',
                 'description': subtask,
                 'tool': 'web_search',
-                'input': query,
+                'input': search_input,
                 'dependencies': []
             })
-        
+
         return {
             'tasks': tasks,
             'execution_order': [t['task_id'] for t in tasks],

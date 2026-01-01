@@ -17,30 +17,62 @@ class ExecutionAgent:
     def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """
         Execute a single task using appropriate tool
-        
+
         Args:
             task: Task dictionary with tool, input, and description
-            
+
         Returns:
             Task result dictionary
         """
         task_id = task.get('task_id', 'unknown')
         tool_name = task.get('tool', 'web_search')
         task_input = task.get('input', '')
-        
+
         logger.info(f"Executing task {task_id} with {tool_name}")
-        
+
         try:
+            # Handle direct responses for conversational queries
+            if tool_name == 'direct_llm':
+                # Simple rule-based responses for common conversational queries
+                input_lower = task_input.lower().strip()
+
+                if any(word in input_lower for word in ['hello', 'hi', 'hey', 'greetings']):
+                    result = "Hello! 👋 How can I help you today?"
+                elif any(word in input_lower for word in ['how are you', 'how do you do']):
+                    result = "I'm doing great, thanks for asking! I'm here and ready to assist you. How can I help?"
+                elif any(word in input_lower for word in ['thanks', 'thank you']):
+                    result = "You're welcome! 😊 Is there anything else I can help you with?"
+                elif any(word in input_lower for word in ['bye', 'goodbye', 'see you']):
+                    result = "Goodbye! 👋 Have a great day!"
+                elif input_lower in ['ok', 'okay', 'sure', 'yes']:
+                    result = "Great! What would you like to do next?"
+                elif input_lower in ['no']:
+                    result = "No problem! Let me know if you need anything else."
+                elif len(input_lower) < 5:  # Very short queries
+                    result = f"I see you said '{task_input}'. How can I assist you with that?"
+                else:
+                    # Fallback for slightly longer conversational queries
+                    result = f"That's interesting! I'd be happy to help you with '{task_input}'. What would you like to know?"
+
+                return {
+                    'task_id': task_id,
+                    'tool': tool_name,
+                    'input': task_input,
+                    'result': result,
+                    'status': 'success',
+                    'agent': 'execution'
+                }
+
             # Get the appropriate tool
             if tool_name not in self.tools:
                 logger.warning(f"Tool {tool_name} not found, using web_search")
                 tool_name = 'web_search'
-            
+
             tool = self.tools[tool_name]
-            
+
             # Execute the tool
             result = tool.func(task_input)
-            
+
             return {
                 'task_id': task_id,
                 'tool': tool_name,
@@ -49,7 +81,7 @@ class ExecutionAgent:
                 'status': 'success',
                 'agent': 'execution'
             }
-            
+
         except Exception as e:
             logger.error(f"Task {task_id} execution error: {e}")
             return {

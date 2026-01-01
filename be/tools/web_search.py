@@ -31,28 +31,44 @@ class WebSearchTool:
             self.ddg = DuckDuckGoSearchAPIWrapper(max_results=5)
             logger.info("Using DuckDuckGo search")
     
-    def search(self, query: str) -> List[Dict[str, Any]]:
+    def search(self, query) -> List[Dict[str, Any]]:
         """
         Perform web search
-        
+
         Args:
-            query: Search query string
-            
+            query: Search query (string or object that can be converted to string)
+
         Returns:
             List of search results with title, url, content
         """
+        # Handle different input types
+        if isinstance(query, dict):
+            # If query is a dict, try to extract meaningful search term
+            search_term = query.get('query', '') or query.get('input', '') or str(query)
+        elif isinstance(query, str):
+            search_term = query
+        else:
+            search_term = str(query)
+
+        # Ensure we have a valid search term
+        if not search_term or not search_term.strip():
+            logger.warning("Empty search query provided")
+            return [{"error": "Empty search query", "query": search_term}]
+
+        search_term = search_term.strip()
+
         try:
             if self.use_tavily:
-                results = self.tavily.invoke(query)
-                logger.info(f"Tavily search for '{query}' returned {len(results)} results")
+                results = self.tavily.invoke(search_term)
+                logger.info(f"Tavily search for '{search_term}' returned {len(results)} results")
                 return self._format_tavily_results(results)
             else:
-                results = self.ddg.run(query)
-                logger.info(f"DuckDuckGo search for '{query}' completed")
+                results = self.ddg.run(search_term)
+                logger.info(f"DuckDuckGo search for '{search_term}' completed")
                 return self._format_ddg_results(results)
         except Exception as e:
             logger.error(f"Search error: {e}")
-            return [{"error": str(e), "query": query}]
+            return [{"error": str(e), "query": search_term}]
     
     def _format_tavily_results(self, results: List[Dict]) -> List[Dict[str, Any]]:
         """Format Tavily results"""
@@ -88,7 +104,7 @@ class WebSearchTool:
         return Tool(
             name="web_search",
             description="Search the web for information. Use this when you need current information, facts, news, or research data. Input should be a clear search query.",
-            func=lambda query: str(self.search(query))
+            func=self.search
         )
 
 

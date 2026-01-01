@@ -49,16 +49,16 @@ function MessageList({ messages }) {
       )
     }
 
-    if (msg.type === 'system' || msg.type === 'status') {
+    if (msg.type === 'system' || msg.type === 'status' || msg.type === 'thinking') {
       return (
-        <div key={msg.id} className="message message-system">
+        <div key={msg.id} className={`message message-${msg.type === 'thinking' ? 'thinking' : 'system'}`}>
           <div className="flex items-center gap-2">
             {msg.agent && (
-              <span className={`agent-badge agent-${msg.agent}`}>
+              <span className={`agent-badge agent-${msg.agent} ${msg.type === 'thinking' ? 'agent-badge-thinking' : ''}`}>
                 {msg.agent}
               </span>
             )}
-            <p className="text-gray-600">{msg.content}</p>
+            <p className={`${msg.type === 'thinking' ? 'text-gray-500 text-sm' : 'text-gray-600'}`}>{msg.content}</p>
           </div>
         </div>
       )
